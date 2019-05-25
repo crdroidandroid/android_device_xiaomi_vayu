@@ -150,8 +150,8 @@
         <value>360.79</value>
         <value>486.77</value>
     </array>
-    <item name="cpu.awake">11.1</item>
-    <item name="cpu.idle">5.93</item>
+    <item name="cpu.idle">11.1</item>
+    <item name="cpu.suspend">5.93</item>
     <item name="battery.capacity">5160</item>
     <item name="wifi.controller.idle">0</item>
     <item name="wifi.controller.rx">0</item>
