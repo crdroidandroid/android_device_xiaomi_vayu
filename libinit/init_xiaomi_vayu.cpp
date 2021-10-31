@@ -9,7 +9,6 @@
 
 #include "vendor_init.h"
 
-#define DESCRIPTION "vayu_global-user 11 RKQ1.200826.002 V12.5.3.0.RJUMIXM release-keys"
 #define FINGERPRINT "POCO/vayu_global/vayu:11/RKQ1.200826.002/V12.5.3.0.RJUMIXM:user/release-keys"
 
 static const variant_info_t vayu_global_info = {
@@ -20,7 +19,6 @@ static const variant_info_t vayu_global_info = {
     .device = "vayu",
     .marketname = "POCO X3 Pro",
     .model = "M2102J20SG",
-    .build_description = DESCRIPTION,
     .build_fingerprint = FINGERPRINT,
 
     .nfc = true,
@@ -34,7 +32,6 @@ static const variant_info_t vayu_eea_info = {
     .device = "vayu",
     .marketname = "POCO X3 Pro",
     .model = "M2102J20SG",
-    .build_description = DESCRIPTION,
     .build_fingerprint = FINGERPRINT,
 
     .nfc = true,
@@ -48,7 +45,6 @@ static const variant_info_t bhima_info = {
     .device = "bhima",
     .marketname = "POCO X3 Pro",
     .model = "M2102J20SI",
-    .build_description = DESCRIPTION,
     .build_fingerprint = FINGERPRINT,
 
     .nfc = false,
