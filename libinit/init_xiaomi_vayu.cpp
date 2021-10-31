@@ -9,8 +9,6 @@
 
 #include "vendor_init.h"
 
-#define FINGERPRINT "POCO/vayu_global/vayu:11/RKQ1.200826.002/V12.5.3.0.RJUMIXM:user/release-keys"
-
 static const variant_info_t vayu_global_info = {
     .hwc_value = "GLOBAL",
     .sku_value = "",
@@ -19,7 +17,7 @@ static const variant_info_t vayu_global_info = {
     .device = "vayu",
     .marketname = "POCO X3 Pro",
     .model = "M2102J20SG",
-    .build_fingerprint = FINGERPRINT,
+    .build_fingerprint = "POCO/vayu_global/vayu:11/RKQ1.200826.002/V12.5.5.0.RJUMIXM:user/release-keys",
 
     .nfc = true,
 };
@@ -32,7 +30,7 @@ static const variant_info_t vayu_eea_info = {
     .device = "vayu",
     .marketname = "POCO X3 Pro",
     .model = "M2102J20SG",
-    .build_fingerprint = FINGERPRINT,
+    .build_fingerprint = "POCO/vayu_eea/vayu:11/RKQ1.200826.002/V12.5.3.0.RJUEUXM:user/release-keys",
 
     .nfc = true,
 };
@@ -45,7 +43,7 @@ static const variant_info_t bhima_info = {
     .device = "bhima",
     .marketname = "POCO X3 Pro",
     .model = "M2102J20SI",
-    .build_fingerprint = FINGERPRINT,
+    .build_fingerprint = "POCO/bhima_in/bhima:11/RKQ1.200826.002/V12.5.4.0.RJUINXM:user/release-keys",
 
     .nfc = false,
 };
