@@ -79,6 +79,7 @@ vendor/lib64/libmegface.so
 vendor/lib64/libMegviiFacepp-0.5.2.so
 vendor/lib64/libmi_supernight_raw_checker.so
 vendor/lib64/libmi_supernight_raw.so
+vendor/lib64/libmiai_portraitsupernight.so
 vendor/lib64/libmialgoengine.so
 vendor/lib64/libmialgo_fs.so
 vendor/lib64/libmialgo_ie_capture.so
@@ -247,6 +248,24 @@ vendor/etc/camera/sr_params.xml|f83901324b80bc1e1af2751e1bb4d95b01977f6e
 
 # Camera firmware
 vendor/firmware/CAMERA_ICP.elf
+
+# Camera prebuilt interfaces
+system_ext/lib/vendor.qti.hardware.camera.device@1.0.so
+system_ext/lib/vendor.qti.hardware.camera.device@2.0.so
+system_ext/lib/vendor.qti.hardware.camera.device@3.5.so
+vendor/bin/hw/android.hardware.camera.provider@2.4-service_64
+vendor/lib/hw/android.hardware.camera.provider@2.4-impl.so
+vendor/lib/android.hardware.camera.provider@2.4-external.so
+vendor/lib/android.hardware.camera.provider@2.4-legacy.so
+vendor/lib/vendor.qti.hardware.camera.device@1.0.so
+vendor/lib/vendor.qti.hardware.camera.device@2.0.so
+vendor/lib/vendor.qti.hardware.camera.device@3.5.so
+vendor/lib64/hw/android.hardware.camera.provider@2.4-impl.so
+vendor/lib64/android.hardware.camera.provider@2.4-external.so
+vendor/lib64/android.hardware.camera.provider@2.4-legacy.so
+vendor/lib64/vendor.qti.hardware.camera.device@1.0.so
+vendor/lib64/vendor.qti.hardware.camera.device@2.0.so
+vendor/lib64/vendor.qti.hardware.camera.device@3.5.so
 
 # Charger
 vendor/bin/batterysecret
