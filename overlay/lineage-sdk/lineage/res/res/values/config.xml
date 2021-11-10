@@ -27,9 +27,14 @@
     <string-array name="config_displayModeMappings" translatable="false">
         <item>none:standard</item>
         <item>smart_eyedefault:reading</item>
-        <item>GM_1:Saturated</item>
         <item>hal_srgb:srgb</item>
         <item>smart_MC:dci_p3</item>
+        <item>video1:cinema</item>
+        <item>video2:cinema</item>
+        <item>video3:cinema</item>
+        <item>GM_1:dynamic</item>
+        <item>GM_2:dynamic</item>
+        <item>GM_3:dynamic</item>
     </string-array>
 
     <!-- Should we filter any display modes which are unampped? -->
