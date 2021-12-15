@@ -16,7 +16,7 @@ static const variant_info_t vayu_global_info = {
     .brand = "POCO",
     .device = "vayu",
     .marketname = "POCO X3 Pro",
-    .model = "M2102J20SG",
+    .model = "M2102J20SI",
     .build_fingerprint = "POCO/vayu_global/vayu:11/RKQ1.200826.002/V12.5.5.0.RJUMIXM:user/release-keys",
 
     .nfc = true,
@@ -29,7 +29,7 @@ static const variant_info_t vayu_eea_info = {
     .brand = "POCO",
     .device = "vayu",
     .marketname = "POCO X3 Pro",
-    .model = "M2102J20SG",
+    .model = "M2102J20SI",
     .build_fingerprint = "POCO/vayu_eea/vayu:11/RKQ1.200826.002/V12.5.3.0.RJUEUXM:user/release-keys",
 
     .nfc = true,
