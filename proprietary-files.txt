@@ -17,6 +17,7 @@ vendor/firmware/tas256x_reg.bin
 
 # Audio hardware
 vendor/lib/hw/audio.primary.msmnile.so
+vendor/lib/hw/sound_trigger.primary.msmnile.so
 vendor/lib/hw/vendor.qti.hardware.audiohalext@1.0-impl.so
 vendor/lib/vndk/libxlog.so
 vendor/lib/liba2dpoffload.so
