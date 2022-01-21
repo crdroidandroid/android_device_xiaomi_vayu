@@ -43,7 +43,7 @@ static const variant_info_t bhima_info = {
     .device = "bhima",
     .marketname = "POCO X3 Pro",
     .model = "M2102J20SI",
-    .build_fingerprint = "POCO/bhima_in/bhima:11/RKQ1.200826.002/V12.5.4.0.RJUINXM:user/release-keys",
+    .build_fingerprint = "POCO/bhima_in/bhima:11/RKQ1.200826.002/V12.5.6.0.RJUINXM:user/release-keys",
 
     .nfc = false,
 };
