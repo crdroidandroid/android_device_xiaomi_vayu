@@ -13,11 +13,11 @@ static const variant_info_t vayu_global_info = {
     .hwc_value = "GLOBAL",
     .sku_value = "",
 
-    .brand = "POCO",
+    .brand = "Xiaomi",
     .device = "vayu",
     .marketname = "POCO X3 Pro",
     .model = "M2102J20SI",
-    .build_fingerprint = "POCO/vayu_global/vayu:11/RKQ1.200826.002/V12.5.7.0.RJUMIXM:user/release-keys",
+    .build_fingerprint = "Xiaomi/vayu_global/vayu:12/RKQ1.200826.002/V13.0.3.0.SJUMIXM:user/release-keys",
 
     .nfc = true,
 };
