@@ -23,6 +23,7 @@ vendor/lib/vndk/libxlog.so
 vendor/lib/liba2dpoffload.so
 vendor/lib/libaudio_log_utils.so
 vendor/lib/libaudioroute_ext.so
+vendor/lib/libresampler.so
 vendor/lib/vendor.qti.hardware.audiohalext@1.0.so
 
 # Camera
@@ -60,7 +61,7 @@ vendor/lib64/hw/camera.qcom.so
 vendor/lib64/hw/com.qti.chi.override.so
 vendor/lib64/libFaceGrade.so
 vendor/lib64/libHalSuperSensorServer.so
-vendor/lib64/libMegviiFacepp-0.5.2.so
+vendor/lib64/libMegviiFacepp-0.5.2.so|4dce8e04d919df9434d2444c7687328018a6e34f
 vendor/lib64/libSNPE.so
 vendor/lib64/libSuperSensor.so
 vendor/lib64/libSuperSensorCPU.so
@@ -80,10 +81,11 @@ vendor/lib64/libcamera_scene.so
 vendor/lib64/libcapiv2svacnn.so
 vendor/lib64/libcapiv2vop.so
 vendor/lib64/libcom.qti.chinodeutils.so
+vendor/lib64/libcvface_api.so
 vendor/lib64/libdualcam_optical_zoom_control.so
 vendor/lib64/libdualcam_video_optical_zoom.so
 vendor/lib64/libft2vendor.so
-vendor/lib64/libmegface.so
+vendor/lib64/libmegface.so|e32055dc224076c8a7e8486292341c4604a12787
 vendor/lib64/libmi_supernight_raw.so
 vendor/lib64/libmi_supernight_raw_checker.so
 vendor/lib64/libmiai_portraitsupernight.so
@@ -229,7 +231,7 @@ vendor/etc/camera/eyelineblush.cng
 vendor/etc/camera/golden_rear_dc_cal_wt.bin
 vendor/etc/camera/golden_rear_dc_cal_wu.bin
 vendor/etc/camera/hdr_ui9_params.config
-vendor/etc/camera/megviifacepp_0_5_2_model
+vendor/etc/camera/megviifacepp_0_5_2_model|1f0cdc706d3853114ecf7a2c0c7436238fcdf258
 vendor/etc/camera/mibokeh_712_opencl.bin
 vendor/etc/camera/mibokeh_712_parameter.bin
 vendor/etc/camera/model_back.dlc
@@ -245,16 +247,14 @@ vendor/etc/camera/vidhance_calibration
 vendor/etc/camera/visidon_clearshot_params_algoup.xml
 vendor/etc/screen_light.xml
 
-# Camera configs - from vayu-user 11 RKQ1.200826.002 V12.0.6.0.RJUMIXM release-keys
+# Camera configs
 vendor/etc/camera/sr_params.xml|f83901324b80bc1e1af2751e1bb4d95b01977f6e
+vendor/etc/camera/st_license.lic
 
 # Camera firmware
 vendor/firmware/CAMERA_ICP.elf
 
 # Camera prebuilt interfaces
-system_ext/lib/vendor.qti.hardware.camera.device@1.0.so
-system_ext/lib/vendor.qti.hardware.camera.device@2.0.so
-system_ext/lib/vendor.qti.hardware.camera.device@3.5.so
 vendor/bin/hw/android.hardware.camera.provider@2.4-service_64
 vendor/lib/hw/android.hardware.camera.provider@2.4-impl.so
 vendor/lib/android.hardware.camera.provider@2.4-external.so
@@ -278,8 +278,17 @@ vendor/lib64/vendor.qti.hardware.camera.device@2.0.so
 vendor/lib64/vendor.qti.hardware.camera.device@3.5.so
 
 # Charger
+vendor/bin/batteryd
 vendor/bin/batterysecret
+vendor/etc/init/init.batteryd.rc
 vendor/etc/init/init.batterysecret.rc
+
+# Charger (MI)
+vendor/bin/hw/vendor.xiaomi.hardware.micharge@1.0-service
+vendor/etc/init/vendor.xiaomi.hardware.micharge@1.0-service.rc
+-vendor/etc/vintf/manifest/vendor.xiaomi.hardware.micharge@1.0.xml
+vendor/lib64/hw/vendor.xiaomi.hardware.micharge@1.0-impl.so
+vendor/lib64/vendor.xiaomi.hardware.micharge@1.0.so
 
 # Display
 vendor/etc/qdcm_calib_data_xiaomi_36_02_0a_video_mode_dsc_dsi_panel.xml|d2f35dc92b118ad5af3851e31d6719e635b8839a
@@ -291,7 +300,7 @@ vendor/lib64/hw/fingerprint.goodix.so:vendor/lib64/hw/fingerprint.goodix.default
 vendor/lib64/libgf_ca.so
 vendor/lib64/libgf_hal.so
 vendor/lib64/libgoodixhwfingerprint.so
-vendor/lib64/vendor.goodix.hardware.cap.biometrics.fingerprint@2.1.so
+vendor/lib64/vendor.xiaomi.hardware.fx.tunnel@1.0.so
 
 # Sensors
 vendor/bin/hw/vendor.qti.hardware.sensorscalibrate@1.0-service
