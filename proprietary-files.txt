@@ -255,6 +255,7 @@ vendor/etc/camera/st_license.lic
 vendor/firmware/CAMERA_ICP.elf
 
 # Camera prebuilt interfaces
+lib64/libcameraservice.so|98774716643a267530014e50a35335b5ce0d4139
 vendor/bin/hw/android.hardware.camera.provider@2.4-service_64
 vendor/lib/hw/android.hardware.camera.provider@2.4-impl.so
 vendor/lib/android.hardware.camera.provider@2.4-external.so
