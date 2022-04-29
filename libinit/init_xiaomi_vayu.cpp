@@ -17,7 +17,7 @@ static const variant_info_t vayu_global_info = {
     .device = "vayu",
     .marketname = "POCO X3 Pro",
     .model = "M2102J20SI",
-    .build_fingerprint = "Xiaomi/vayu_global/vayu:12/RKQ1.200826.002/V13.0.3.0.SJUMIXM:user/release-keys",
+    .build_fingerprint = "Xiaomi/vayu_global/vayu:12/RKQ1.200826.002/V13.0.4.0.SJUMIXM:user/release-keys",
 
     .nfc = true,
 };
@@ -30,7 +30,7 @@ static const variant_info_t vayu_eea_info = {
     .device = "vayu",
     .marketname = "POCO X3 Pro",
     .model = "M2102J20SI",
-    .build_fingerprint = "POCO/vayu_eea/vayu:11/RKQ1.200826.002/V12.5.3.0.RJUEUXM:user/release-keys",
+    .build_fingerprint = "POCO/vayu_eea/vayu:12/RKQ1.200826.002/V13.0.1.0.SJUEUXM:user/release-keys",
 
     .nfc = true,
 };
@@ -43,7 +43,7 @@ static const variant_info_t bhima_info = {
     .device = "bhima",
     .marketname = "POCO X3 Pro",
     .model = "M2102J20SI",
-    .build_fingerprint = "POCO/bhima_in/bhima:11/RKQ1.200826.002/V12.5.6.0.RJUINXM:user/release-keys",
+    .build_fingerprint = "POCO/bhima_in/bhima:12/RKQ1.200826.002/V13.0.1.0.SJUINXM:user/release-keys",
 
     .nfc = false,
 };
