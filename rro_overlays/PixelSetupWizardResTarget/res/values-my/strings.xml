@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bc_welcome_message">သင်၏ Poco က ကြိုဆိုပါသည်</string>
+    <string name="deferred_setup_wizard_title">crDroid ကို စနစ်ထည့်သွင်းပြီးပါပြီ</string>
+    <string name="device_name">Poco X3 Pro</string>
+    <string name="setup_wizard_title">crDroid စနစ်ထည့်သွင်းမှု</string>
+</resources>

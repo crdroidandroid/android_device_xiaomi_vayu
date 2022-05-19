@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bc_welcome_message">Pocoலுக்கு வரவேற்கிறோம்</string>
+    <string name="deferred_setup_wizard_title">crDroidலை அமைப்பதை முடிக்கவும்</string>
+    <string name="device_name">Poco X3 Pro</string>
+    <string name="setup_wizard_title">crDroid அமைவு</string>
+</resources>

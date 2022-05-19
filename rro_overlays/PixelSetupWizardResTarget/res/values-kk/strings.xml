@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bc_welcome_message">Poco телефоныңызға қош келдіңіз!</string>
+    <string name="deferred_setup_wizard_title">crDroid телефонын реттеуді аяқтау</string>
+    <string name="device_name">Poco X3 Pro</string>
+    <string name="setup_wizard_title">crDroid Setup</string>
+</resources>

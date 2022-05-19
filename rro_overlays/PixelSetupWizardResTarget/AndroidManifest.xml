@@ -1,0 +1,6 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.google.android.pixel.setupwizard.strings.overlay"
+    android:versionCode="1"
+    android:versionName="1.0">
+    <overlay android:targetName="PixelSetupWizard" android:targetPackage="com.google.android.pixel.setupwizard" android:isStatic="true" />
+</manifest>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bc_welcome_message">Selamat datang ke Poco anda</string>
+    <string name="deferred_setup_wizard_title">Selesaikan persediaan crDroid</string>
+    <string name="device_name">Poco X3 Pro</string>
+    <string name="setup_wizard_title">Persediaan crDroid</string>
+</resources>
