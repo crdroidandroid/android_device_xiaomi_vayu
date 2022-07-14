@@ -16,8 +16,6 @@
      limitations under the License.
 -->
 <resources>
-    <!-- Whether device has a notch -->
-    <bool name="config_haveNotch">true</bool>
 
     <!-- Display mode remapping table.
          If the mode names returned by the backend do not match
