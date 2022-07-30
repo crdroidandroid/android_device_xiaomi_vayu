@@ -24,26 +24,15 @@
     <!-- the padding on the top of the statusbar (usually 0) -->
     <dimen name="status_bar_padding_top">8dp</dimen>
 
-    <!-- the padding on the rouded corner content -->
-    <dimen name="rounded_corner_content_padding">6dp</dimen>
-
     <!-- the padding on the start of the statusbar -->
     <dimen name="status_bar_padding_start">12dp</dimen>
 
     <!-- the padding on the end of the statusbar -->
     <dimen name="status_bar_padding_end">5dp</dimen>
 
-    <!-- the padding on the end of the keyguard statusbar -->
-    <dimen name="system_icons_keyguard_padding_end">14dp</dimen>
-
     <!-- Location on the screen of the center of the physical power button. This is a reasonable
     default that should be overridden by device-specific overlays. -->
     <dimen name="physical_power_button_center_screen_location_y">1020px</dimen>
-
-    <!-- Location on the screen of the center of the physical volume up/down buttons. This is a
-    reasonable default that should be overridden by device-specific overlays. -->
-    <dimen name="physical_volume_up_button_center_screen_location_y">600px</dimen>
-    <dimen name="physical_volume_down_button_center_screen_location_y">700px</dimen>
 
     <!-- Location on the screen of the center of the fingerprint sensor. For devices with under
      display fingerprint sensors, this directly corresponds to the fingerprint sensor's location.
