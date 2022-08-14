@@ -23,10 +23,4 @@
 
     <!-- If not zero, limits the internal screen recorder's framerate to the set value. -->
     <integer name="config_screenRecorderMaxFramerate">90</integer>
-
-    <!-- Whether usage of the proximity sensor during doze is supported -->
-    <bool name="doze_proximity_sensor_supported">false</bool>
-
-    <!-- Doze: check proximity sensor before pulsing? -->
-    <bool name="doze_proximity_check_before_pulse">false</bool>
 </resources>
