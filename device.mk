@@ -27,6 +27,10 @@ PRODUCT_SHIPPING_API_LEVEL := 30
 PRODUCT_PACKAGES += \
     libkeymaster_messages.vendor
 
+# WiFi
+PRODUCT_PACKAGES += \
+    VayuWifiOverlay
+
 # Soong namespaces
 PRODUCT_SOONG_NAMESPACES += \
     $(LOCAL_PATH)
