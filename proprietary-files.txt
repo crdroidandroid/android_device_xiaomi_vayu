@@ -45,6 +45,7 @@ vendor/lib/rfsa/adsp/tas25xx_TI_0.bin
 vendor/firmware/tas256x_reg.bin
 
 # Audio hardware
+system/lib/libxlog.so
 vendor/lib/hw/audio.primary.msmnile.so
 vendor/lib/hw/sound_trigger.primary.msmnile.so
 vendor/lib/hw/vendor.qti.hardware.audiohalext@1.0-impl.so
@@ -307,9 +308,7 @@ vendor/lib64/vendor.qti.hardware.camera.device@2.0.so
 vendor/lib64/vendor.qti.hardware.camera.device@3.5.so
 
 # Charger
-vendor/bin/batteryd
 vendor/bin/batterysecret
-vendor/etc/init/init.batteryd.rc
 vendor/etc/init/init.batterysecret.rc
 
 # Charger (MI)
@@ -375,6 +374,7 @@ vendor/etc/init/vendor.sensors.sscrpcd.rc
 vendor/etc/sensors/hals.conf
 vendor/lib64/hw/vendor.qti.hardware.sensorscalibrate@1.0-impl.so
 vendor/lib64/libnotifyaudiohal.so
+vendor/lib64/libsensor_cal_v2.so
 vendor/lib64/libsensorcal.so
 vendor/lib64/libsensorslog.so
 vendor/lib64/libsns_fastRPC_util.so
