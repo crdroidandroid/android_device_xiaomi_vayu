@@ -2,9 +2,5 @@
   {
     "repository": "android_device_xiaomi_sm8150-common",
     "target_path": "device/xiaomi/sm8150-common"
-  },
-  {
-    "repository": "android_kernel_xiaomi_vayu",
-    "target_path": "kernel/xiaomi/vayu"
   }
 ]
