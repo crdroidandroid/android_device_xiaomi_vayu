@@ -375,19 +375,4 @@
          Note that a physical cutout should be configured in pixels for the best results.
          -->
     <string name="config_mainBuiltInDisplayCutout">M 0,0 H -36 V 91 H 36 V 0 H 0 Z</string>
-
-    <!-- Height of the status bar.
-         Do not read this dimen directly. Use {@link SystemBarUtils#getStatusBarHeight} instead.
-         -->
-    <dimen name="status_bar_height_default">28dp</dimen>
-    <dimen name="status_bar_height_portrait">98px</dimen>
-    <dimen name="status_bar_height_landscape">28dp</dimen>
-
-    <!-- Radius of the software rounded corners at the top of the display in its natural
-        orientation. If zero, the value of rounded_corner_radius is used. -->
-    <dimen name="rounded_corner_radius_top">106px</dimen>
-
-    <!-- Radius of the software rounded corners at the bottom of the display in its natural
-        orientation. If zero, the value of rounded_corner_radius is used. -->
-    <dimen name="rounded_corner_radius_bottom">106px</dimen>
 </resources>
