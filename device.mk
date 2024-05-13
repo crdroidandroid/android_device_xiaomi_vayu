@@ -28,6 +28,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/camera/camera_cnf.txt:$(TARGET_COPY_OUT_VENDOR)/etc/camera/camera_cnf.txt
 
+# Device-specific settings
+PRODUCT_PACKAGES += \
+    XiaomiPartsVayu
+
 # Fingerprint
 PRODUCT_PACKAGES += \
     libkeymaster_messages.vendor
