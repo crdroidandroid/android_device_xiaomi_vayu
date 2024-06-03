@@ -10,7 +10,6 @@ function blob_fixup() {
     case "${1}" in
         vendor/etc/init/init.batterysecret.rc)
             sed -i "/seclabel u:r:batterysecret:s0/d" "${2}"
-            sed -i "s|on charger|on property:init.svc.vendor.charger=running|g" "${2}"
             ;;
         vendor/lib64/hw/camera.qcom.so)
             sed -i "s/\x73\x74\x5F\x6C\x69\x63\x65\x6E\x73\x65\x2E\x6C\x69\x63/\x63\x61\x6D\x65\x72\x61\x5F\x63\x6E\x66\x2E\x74\x78\x74/g" "${2}"
