@@ -16,15 +16,18 @@
 -->
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:settings="http://schemas.android.com/apk/res/org.lineageos.settings"
     android:title="@string/haptic_title">
 
-    <org.lineageos.settings.widget.SeekBarPreference
+    <org.lineageos.settings.preferences.CustomSeekBarPreference
         android:key="haptic_level_pref"
         android:title="@string/haptic_level_title"
         android:summary="@string/haptic_level_summary"
         android:layout="@layout/preference_slider"
-        android:defaultValue="@integer/haptic_level_default"
-        android:max="@integer/haptic_level_max" />
+        android:defaultValue="80"
+        android:max="100"
+        android:min="0"
+        settings:units="%" />
 
     <com.android.settingslib.widget.FooterPreference
         android:key="haptic_footer_preference"
