@@ -99,7 +99,7 @@ vendor/lib64/camera/fdconfigpreviewlite.bin
 vendor/lib64/camera/fdconfigvideo.bin
 vendor/lib64/camera/fdconfigvideolite.bin
 vendor/lib64/hw/camera.qcom.so
-vendor/lib64/hw/com.qti.chi.override.so
+vendor/lib64/hw/com.qti.chi.override.so;DISABLE_CHECKELF
 vendor/lib64/libFaceGrade.so
 vendor/lib64/libHalSuperSensorServer.so
 vendor/lib64/libSNPE.so
@@ -109,10 +109,10 @@ vendor/lib64/libVDClearShot.so
 vendor/lib64/libXMFD_AgeGender.so
 vendor/lib64/lib_denoiser3.so
 vendor/lib64/lib_sr_models.so
-vendor/lib64/libalAILDC.so
+vendor/lib64/libalAILDC.so;DISABLE_CHECKELF
 vendor/lib64/libalCFR.so
-vendor/lib64/libalLDC.so
-vendor/lib64/libalhLDC.so
+vendor/lib64/libalLDC.so;DISABLE_CHECKELF
+vendor/lib64/libalhLDC.so;DISABLE_CHECKELF
 vendor/lib64/libarcdualcamsat.so
 vendor/lib64/libc++_shared.so
 vendor/lib64/libcamera_dirty.so
@@ -131,12 +131,12 @@ vendor/lib64/libmiai_portraitsupernight.so
 vendor/lib64/libmialgo_fs.so
 vendor/lib64/libmialgo_ie_capture.so
 vendor/lib64/libmialgo_image_colourkeeping.so
-vendor/lib64/libmialgo_rfs.so
+vendor/lib64/libmialgo_rfs.so;DISABLE_CHECKELF
 vendor/lib64/libmialgo_sd.so
 vendor/lib64/libmialgo_utils.so
 vendor/lib64/libmialgo_video_colourkeeping.so
 vendor/lib64/libmialgo_video_seg.so
-vendor/lib64/libmialgoengine.so
+vendor/lib64/libmialgoengine.so;DISABLE_CHECKELF
 vendor/lib64/libmibokeh_712.so
 vendor/lib64/libmibokeh_845_video.so
 vendor/lib64/libmibokeh_855.so
