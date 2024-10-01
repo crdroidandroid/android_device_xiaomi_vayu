@@ -303,7 +303,6 @@ vendor/lib64/hw/fingerprint.goodix.so:vendor/lib64/hw/fingerprint.goodix.default
 vendor/lib64/libgf_ca.so
 vendor/lib64/libgf_hal.so
 vendor/lib64/libgoodixhwfingerprint.so
-vendor/lib64/vendor.xiaomi.hardware.fx.tunnel@1.0.so
 
 # Graphics (Adreno firmware)
 vendor/firmware/a612_rgmu.bin

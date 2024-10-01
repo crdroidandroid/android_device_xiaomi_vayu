@@ -41,7 +41,8 @@ PRODUCT_PACKAGES += \
 
 # Fingerprint
 PRODUCT_PACKAGES += \
-    libkeymaster_messages.vendor
+    libkeymaster_messages.vendor \
+    vendor.xiaomi.hardware.fx.tunnel@1.0.vendor
 
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += \
