@@ -1,0 +1,12 @@
+<manifest version="2.0" type="device">    
+    <hal format="hidl">
+        <name>vendor.xiaomi.hardware.fx.tunnel</name>
+        <transport>hwbinder</transport>
+        <version>1.0</version>
+        <interface>
+            <name>IMiFxTunnel</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+</manifest>
+
