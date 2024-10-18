@@ -14,6 +14,9 @@ BUILD_BROKEN_DUP_RULES := true
 # Assert
 TARGET_OTA_ASSERT_DEVICE := vayu,bhima
 
+# Audio
+TARGET_PROVIDES_AUDIO_EXTNS := true
+
 # Display
 TARGET_SCREEN_DENSITY := 410
 
