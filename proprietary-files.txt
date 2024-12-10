@@ -109,10 +109,10 @@ vendor/lib64/libVDClearShot.so
 vendor/lib64/libXMFD_AgeGender.so
 vendor/lib64/lib_denoiser3.so
 vendor/lib64/lib_sr_models.so
-vendor/lib64/libalAILDC.so;DISABLE_CHECKELF
+vendor/lib64/libalAILDC.so
 vendor/lib64/libalCFR.so
-vendor/lib64/libalLDC.so;DISABLE_CHECKELF
-vendor/lib64/libalhLDC.so;DISABLE_CHECKELF
+vendor/lib64/libalLDC.so
+vendor/lib64/libalhLDC.so
 vendor/lib64/libarcdualcamsat.so
 vendor/lib64/libc++_shared.so
 vendor/lib64/libcamera_dirty.so

@@ -71,6 +71,12 @@ blob_fixups: blob_fixups_user_type = {
         .add_needed('libpiex_shim.so'),
     'vendor/lib64/camera/components/com.vidhance.node.eis.so': blob_fixup()
         .call(blob_fixup_graphic_buffer_size),
+    ('vendor/lib64/libalLDC.so', 'vendor/lib64/libalAILDC.so', 'vendor/lib64/libalhLDC.so'): blob_fixup()
+        .clear_symbol_version('AHardwareBuffer_allocate')
+        .clear_symbol_version('AHardwareBuffer_describe')
+        .clear_symbol_version('AHardwareBuffer_lock')
+        .clear_symbol_version('AHardwareBuffer_release')
+        .clear_symbol_version('AHardwareBuffer_unlock'),
     'vendor/lib64/hw/camera.qcom.so': blob_fixup()
         .binary_regex_replace(
             b'\x73\x74\x5F\x6C\x69\x63\x65\x6E\x73\x65\x2E\x6C\x69\x63',
