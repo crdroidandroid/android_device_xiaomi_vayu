@@ -329,4 +329,6 @@
         <ctl name="EC Reference SampleRate" value="48000"/>
     </path>
 
+    <path name="hph-highquality-mode">
+    </path>
 </mixer>
