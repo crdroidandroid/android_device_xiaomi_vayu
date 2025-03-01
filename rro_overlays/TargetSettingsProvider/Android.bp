@@ -1,0 +1,4 @@
+runtime_resource_overlay {
+    name: "TargetSettingsProvider",
+    product_specific: true,
+}
