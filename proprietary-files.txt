@@ -118,8 +118,6 @@ vendor/lib64/libc++_shared.so
 vendor/lib64/libcamera_dirty.so
 vendor/lib64/libcamera_nn_stub.so
 vendor/lib64/libcamera_scene.so
-vendor/lib64/libcapiv2svacnn.so
-vendor/lib64/libcapiv2vop.so
 vendor/lib64/libcom.qti.chinodeutils.so
 vendor/lib64/libcvface_api.so
 vendor/lib64/libdualcam_optical_zoom_control.so
