@@ -219,7 +219,7 @@
     <!-- echo reference -->
     <ctl name="AUDIO_REF_EC_UL1 MUX" value="None" />
     <ctl name="AUDIO_REF_EC_UL10 MUX" value="None" />
-    <ctl name="EC Reference Channels" value="Two"/>
+    <ctl name="EC Reference Channels" value="One"/>
     <!-- usb headset -->
     <ctl name="AFE_PCM_RX Audio Mixer MultiMedia1" value="0" />
     <ctl name="AFE_PCM_RX Audio Mixer MultiMedia2" value="0" />
@@ -514,7 +514,7 @@
     <ctl name="RX INT2 DEM MUX" value="CLSH_DSM_OUT" />
 
     <!-- Headphone Default mode - uLP -->
-    <ctl name="RX HPH Mode" value="CLS_H_HIFI" />
+    <ctl name="RX HPH Mode" value="CLS_H_LOHIFI" />
     <ctl name="ASRC0 Output Mode" value="INT" />
     <ctl name="ASRC1 Output Mode" value="INT" />
 
@@ -1087,7 +1087,7 @@
     </path>
 
     <path name="echo-reference headphones">
-        <ctl name="EC Reference Channels" value="Two"/>
+        <ctl name="EC Reference Channels" value="One"/>
         <ctl name="AUDIO_REF_EC_UL1 MUX" value="SLIM_6_RX" />
     </path>
 
@@ -1106,17 +1106,17 @@
     </path>
 
     <path name="echo-reference-voip earpiece">
-        <ctl name="EC Reference Channels" value="Two"/>
+        <ctl name="EC Reference Channels" value="One"/>
         <ctl name="AUDIO_REF_EC_UL10 MUX" value="SLIM_RX" />
     </path>
 
     <path name="echo-reference earpiece">
-        <ctl name="EC Reference Channels" value="Two"/>
+        <ctl name="EC Reference Channels" value="One"/>
         <ctl name="AUDIO_REF_EC_UL1 MUX" value="SLIM_RX" />
     </path>
 
     <path name="echo-reference-voip headphones">
-        <ctl name="EC Reference Channels" value="Two"/>
+        <ctl name="EC Reference Channels" value="One"/>
         <ctl name="AUDIO_REF_EC_UL10 MUX" value="SLIM_6_RX" />
     </path>
 
@@ -1132,22 +1132,22 @@
     </path>
 
     <path name="echo-reference-voip speaker">
-        <ctl name="EC Reference Channels" value="Two"/>
+        <ctl name="EC Reference Channels" value="One"/>
         <ctl name="AUDIO_REF_EC_UL10 MUX" value="QUAT_MI2S_TX" />
     </path>
 
     <path name="echo-reference speaker">
-        <ctl name="EC Reference Channels" value="Two"/>
+        <ctl name="EC Reference Channels" value="One"/>
         <ctl name="AUDIO_REF_EC_UL1 MUX" value="QUAT_MI2S_TX" />
     </path>
 
     <path name="echo-reference-voip bt-sco-headset">
-        <ctl name="EC Reference Channels" value="Two"/>
+        <ctl name="EC Reference Channels" value="One"/>
         <ctl name="AUDIO_REF_EC_UL10 MUX" value="SLIM_7_RX" />
     </path>
 
     <path name="echo-reference bt-sco-headset">
-        <ctl name="EC Reference Channels" value="Two"/>
+        <ctl name="EC Reference Channels" value="One"/>
         <ctl name="AUDIO_REF_EC_UL1 MUX" value="SLIM_7_RX" />
     </path>
 
@@ -1155,12 +1155,12 @@
     </path>
 
     <path name="echo-reference-voip usb-headphones">
-        <ctl name="EC Reference Channels" value="Two"/>
+        <ctl name="EC Reference Channels" value="One"/>
         <ctl name="AUDIO_REF_EC_UL10 MUX" value="USB_AUDIO_RX" />
     </path>
 
     <path name="echo-reference usb-headphones">
-        <ctl name="EC Reference Channels" value="Two"/>
+        <ctl name="EC Reference Channels" value="One"/>
         <ctl name="AUDIO_REF_EC_UL1 MUX" value="USB_AUDIO_RX" />
     </path>
 
@@ -3049,11 +3049,11 @@
     </path>
 
     <path name="hph-highquality-mode">
-        <ctl name="RX HPH Mode" value="CLS_H_HIFI" />
+        <ctl name="RX HPH Mode" value="CLS_H_LOHIFI" />
     </path>
 
     <path name="hph-lowpower-mode">
-        <ctl name="RX HPH Mode" value="CLS_H_HIFI" />
+        <ctl name="RX HPH Mode" value="CLS_H_LOHIFI" />
     </path>
 
     <path name="true-native-mode">

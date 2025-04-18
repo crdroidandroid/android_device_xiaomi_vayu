@@ -96,7 +96,7 @@
     <ctl name="WDMA3_ON_OFF Switch" value="0" />
     <ctl name="SLIM_1_TX Channels" value="One" />
     <ctl name="AUDIO_REF_EC_UL1 MUX" value="None"/>
-    <ctl name="EC Reference Channels" value="Two"/>
+    <ctl name="EC Reference Channels" value="One"/>
     <ctl name="EC Reference Bit Format" value="0"/>
     <ctl name="EC Reference SampleRate" value="0"/>
 
@@ -365,6 +365,4 @@
         <ctl name="EC Reference SampleRate" value="48000"/>
     </path>
 
-    <path name="hph-highquality-mode">
-    </path>
 </mixer>

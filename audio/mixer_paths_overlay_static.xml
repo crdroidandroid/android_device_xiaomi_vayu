@@ -18,7 +18,7 @@
     <ctl name="ADC4 Volume" value="12" />
     <ctl name="AUDIO_REF_EC_UL1 MUX" value="None" />
     <ctl name="AUDIO_REF_EC_UL10 MUX" value="None" />
-    <ctl name="EC Reference Channels" value="Two"/>
+    <ctl name="EC Reference Channels" value="Zero"/>
     <ctl name="QUAT_MI2S_RX Channels" value="Two" />
     <ctl name="QUAT_MI2S_RX Format" value="S24_LE" />
     <ctl name="QUAT_MI2S_RX SampleRate" value="KHZ_48" />
@@ -626,12 +626,12 @@
 
     <path name="echo-reference handset">
         <ctl name="AUDIO_REF_EC_UL1 MUX" value="QUAT_MI2S_RX" />
-        <ctl name="EC Reference Channels" value="Two"/>
+        <ctl name="EC Reference Channels" value="One"/>
     </path>
 
     <path name="echo-reference earpiece">
         <ctl name="AUDIO_REF_EC_UL1 MUX" value="QUAT_MI2S_RX" />
-        <ctl name="EC Reference Channels" value="Two"/>
+        <ctl name="EC Reference Channels" value="One"/>
     </path>
 
     <path name="echo-reference speaker">
@@ -665,12 +665,12 @@
 
     <path name="echo-reference-voip handset">
         <ctl name="AUDIO_REF_EC_UL10 MUX" value="QUAT_MI2S_RX" />
-        <ctl name="EC Reference Channels" value="Two"/>
+        <ctl name="EC Reference Channels" value="One"/>
     </path>
 
     <path name="echo-reference-voip earpiece">
         <ctl name="AUDIO_REF_EC_UL10 MUX" value="QUAT_MI2S_RX" />
-        <ctl name="EC Reference Channels" value="Two"/>
+        <ctl name="EC Reference Channels" value="One"/>
     </path>
 
     <path name="echo-reference-voip speaker">
@@ -991,6 +991,4 @@
         <ctl name="DEC7 Volume" value="90" />
     </path>
 
-    <path name="hph-highquality-mode">
-    </path>
 </mixer>
