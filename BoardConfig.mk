@@ -22,7 +22,6 @@ TARGET_SCREEN_DENSITY := 410
 DEVICE_MANIFEST_FILE += $(DEVICE_PATH)/configs/hidl/manifest.xml
 
 # Init
-TARGET_INIT_VENDOR_LIB := //$(DEVICE_PATH):init_xiaomi_vayu
 TARGET_RECOVERY_DEVICE_MODULES := init_xiaomi_vayu
 
 # Kernel
