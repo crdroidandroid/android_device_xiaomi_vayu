@@ -21,9 +21,6 @@ TARGET_SCREEN_DENSITY := 410
 # HIDL
 DEVICE_MANIFEST_FILE += $(DEVICE_PATH)/configs/hidl/manifest.xml
 
-# Init
-TARGET_RECOVERY_DEVICE_MODULES := init_xiaomi_vayu
-
 # Kernel
 TARGET_KERNEL_CONFIG += vendor/xiaomi/vayu.config
 
