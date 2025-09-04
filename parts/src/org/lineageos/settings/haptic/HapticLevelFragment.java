@@ -26,19 +26,21 @@ import android.view.ViewGroup;
 
 import androidx.preference.Preference;
 import androidx.preference.Preference.OnPreferenceChangeListener;
-import androidx.preference.PreferenceFragment;
+
+import com.android.settingslib.widget.SettingsBasePreferenceFragment;
 
 import org.lineageos.settings.R;
 import org.lineageos.settings.preferences.CustomSeekBarPreference;
 import org.lineageos.settings.utils.FileUtils;
 
-public class HapticLevelFragment extends PreferenceFragment implements OnPreferenceChangeListener {
+public class HapticLevelFragment extends SettingsBasePreferenceFragment
+        implements OnPreferenceChangeListener {
 
     private Vibrator mVibrator;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(R.xml.haptic_settings);
+        setPreferencesFromResource(R.xml.haptic_settings, rootKey);
 
         final CustomSeekBarPreference mHapticLevel = (CustomSeekBarPreference) findPreference(HapticUtils.PREF_LEVEL);
         if (FileUtils.fileExists(HapticUtils.PATH_LEVEL)) {
@@ -55,20 +57,11 @@ public class HapticLevelFragment extends PreferenceFragment implements OnPrefere
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        final View view = LayoutInflater.from(getContext()).inflate(R.layout.haptic, container, false);
-        ((ViewGroup) view).addView(super.onCreateView(inflater, container, savedInstanceState));
-        return view;
-    }
-
-    @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         if (HapticUtils.PREF_LEVEL.equals(preference.getKey())) {
             HapticUtils.applyLevel(getContext(), (int) newValue, true);
             doHapticFeedback();
         }
-
         return true;
     }
 

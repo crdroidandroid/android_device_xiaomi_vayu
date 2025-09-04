@@ -22,14 +22,13 @@ import com.android.settingslib.collapsingtoolbar.CollapsingToolbarBaseActivity;
 
 public class ThermalActivity extends CollapsingToolbarBaseActivity {
 
-    private static final String TAG_THERMAL = "thermal";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getFragmentManager().beginTransaction().replace(
-                com.android.settingslib.collapsingtoolbar.R.id.content_frame,
-                new ThermalSettingsFragment(), TAG_THERMAL).commit();
+        getSupportFragmentManager()
+            .beginTransaction()
+            .replace(com.android.settingslib.collapsingtoolbar.R.id.content_frame, new ThermalSettingsFragment())
+            .commit();
     }
 }
