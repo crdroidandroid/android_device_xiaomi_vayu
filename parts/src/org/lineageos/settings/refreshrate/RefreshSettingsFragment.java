@@ -41,6 +41,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.android.settingslib.applications.ApplicationsState;
+import com.android.settingslib.widget.MainSwitchPreference;
 import com.android.settingslib.widget.SettingsBasePreferenceFragment;
 
 import org.lineageos.settings.R;
@@ -64,6 +65,23 @@ public class RefreshSettingsFragment extends SettingsBasePreferenceFragment
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        setPreferencesFromResource(R.xml.refresh_settings, rootKey);
+
+        MainSwitchPreference master = findPreference("refresh_master_enabled");
+        if (master != null) {
+            Context ctx = getActivity();
+            master.setChecked(RefreshUtils.isServiceEnabled(ctx));
+            master.setOnPreferenceChangeListener((pref, newValue) -> {
+                boolean isEnabled = (Boolean) newValue;
+                RefreshUtils.setServiceEnabled(ctx, isEnabled);
+                if (mAppsRecyclerView != null) {
+                    mAppsRecyclerView.setEnabled(isEnabled);
+                    mAppsRecyclerView.setVisibility(isEnabled ? View.VISIBLE : View.GONE);
+                }
+                if (isEnabled) rebuild();
+                return true;
+            });
+        }
     }
 
     @Override
@@ -83,18 +101,26 @@ public class RefreshSettingsFragment extends SettingsBasePreferenceFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.refresh_layout, container, false);
-    }
+        View wrapper = inflater.inflate(R.layout.refresh_container, container, false);
 
-    @Override
-    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        View prefs = super.onCreateView(inflater, container, savedInstanceState);
+        ((ViewGroup) wrapper.findViewById(R.id.prefs_container)).addView(prefs);
+        if (prefs instanceof RecyclerView) {
+            ((RecyclerView) prefs).setNestedScrollingEnabled(false);
+        }
 
-        mAppsRecyclerView = view.findViewById(R.id.refresh_rv_view);
+        mAppsRecyclerView = wrapper.findViewById(R.id.refresh_rv_view);
         mAppsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAppsRecyclerView.setAdapter(mAllPackagesAdapter);
-    }
+        mAppsRecyclerView.setHasFixedSize(false);
+        mAppsRecyclerView.setNestedScrollingEnabled(false);
 
+        boolean enabled = RefreshUtils.isServiceEnabled(getActivity());
+        mAppsRecyclerView.setEnabled(enabled);
+        mAppsRecyclerView.setVisibility(enabled ? View.VISIBLE : View.GONE);
+
+        return wrapper;
+    }
 
     @Override
     public void onResume() {
@@ -118,7 +144,8 @@ public class RefreshSettingsFragment extends SettingsBasePreferenceFragment
 
     @Override
     public void onRebuildComplete(ArrayList<ApplicationsState.AppEntry> entries) {
-        if (entries != null) {
+        Context ctx = getActivity();
+        if (RefreshUtils.isServiceEnabled(ctx) && entries != null) {
             handleAppEntries(entries);
             mAllPackagesAdapter.notifyDataSetChanged();
         }

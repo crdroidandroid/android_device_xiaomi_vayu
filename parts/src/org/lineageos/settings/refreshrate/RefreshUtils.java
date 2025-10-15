@@ -27,8 +27,8 @@ import androidx.preference.PreferenceManager;
 
 public final class RefreshUtils {
 
+    private static final String REFRESH_ENABLED = "refresh_master_enabled";
     private static final String REFRESH_CONTROL = "refresh_control";
-    private static final String REFRESH_SERVICE = "refresh_service";
 
     private static final String KEY_PEAK_REFRESH_RATE = "peak_refresh_rate";
     private static final String KEY_MIN_REFRESH_RATE = "min_refresh_rate";
@@ -69,25 +69,32 @@ public final class RefreshUtils {
         defaultMaxRate = Settings.System.getFloat(context.getContentResolver(), KEY_PEAK_REFRESH_RATE, REFRESH_STATE_DEFAULT);
         defaultMinRate = Settings.System.getFloat(context.getContentResolver(), KEY_MIN_REFRESH_RATE, REFRESH_STATE_DEFAULT);
 
-        if (isServiceEnabled(context))
+        if (isServiceEnabled(context)) {
             startService(context);
-        else
+        } else {
+            stopService(context);
             setDefaultRefreshRate(context);
+        }
     }
 
     public static void startService(Context context) {
         context.startServiceAsUser(new Intent(context, RefreshService.class),
                 UserHandle.CURRENT);
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(REFRESH_SERVICE, "true").apply();
     }
 
     protected static void stopService(Context context) {
         context.stopService(new Intent(context, RefreshService.class));
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(REFRESH_SERVICE, "false").apply();
+    }
+
+    protected static void setServiceEnabled(Context context, Boolean enabled) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit().putBoolean(REFRESH_ENABLED, enabled).apply();
+        initialize(context);
     }
 
     protected static boolean isServiceEnabled(Context context) {
-        return true;
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(REFRESH_ENABLED, false);
     }
 
     private void writeValue(String profiles) {
@@ -159,6 +166,10 @@ public final class RefreshUtils {
     }
 
     protected void setRefreshRate(String packageName) {
+        if (!isServiceEnabled(mContext)) {
+            return;
+        }
+
         String value = getValue();
         String modes[];
 
