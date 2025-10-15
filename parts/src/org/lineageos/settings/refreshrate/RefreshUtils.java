@@ -41,7 +41,6 @@ public final class RefreshUtils {
     protected static final int STATE_HIGH = 4;
     protected static final int STATE_EXTREME = 5;
 
-    private static final float REFRESH_STATE_DEFAULT = 120f;
     private static final float REFRESH_STATE_LOW = 30f;
     private static final float REFRESH_STATE_MODERATE = 50f;
     private static final float REFRESH_STATE_STANDARD = 60f;
@@ -66,8 +65,8 @@ public final class RefreshUtils {
     }
 
     public static void initialize(Context context) {
-        defaultMaxRate = Settings.System.getFloat(context.getContentResolver(), KEY_PEAK_REFRESH_RATE, REFRESH_STATE_DEFAULT);
-        defaultMinRate = Settings.System.getFloat(context.getContentResolver(), KEY_MIN_REFRESH_RATE, REFRESH_STATE_DEFAULT);
+        defaultMaxRate = Settings.System.getFloat(context.getContentResolver(), KEY_PEAK_REFRESH_RATE, REFRESH_STATE_EXTREME);
+        defaultMinRate = Settings.System.getFloat(context.getContentResolver(), KEY_MIN_REFRESH_RATE, REFRESH_STATE_STANDARD);
 
         if (isServiceEnabled(context)) {
             startService(context);
@@ -174,8 +173,8 @@ public final class RefreshUtils {
         String modes[];
 
         if (!isAppInList) {
-            defaultMaxRate = Settings.System.getFloat(mContext.getContentResolver(), KEY_PEAK_REFRESH_RATE, REFRESH_STATE_DEFAULT);
-            defaultMinRate = Settings.System.getFloat(mContext.getContentResolver(), KEY_MIN_REFRESH_RATE, REFRESH_STATE_DEFAULT);
+            defaultMaxRate = Settings.System.getFloat(mContext.getContentResolver(), KEY_PEAK_REFRESH_RATE, REFRESH_STATE_EXTREME);
+            defaultMinRate = Settings.System.getFloat(mContext.getContentResolver(), KEY_MIN_REFRESH_RATE, REFRESH_STATE_STANDARD);
         }
 
         float minrate = defaultMinRate;
