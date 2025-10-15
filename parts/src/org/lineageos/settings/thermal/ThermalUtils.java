@@ -27,8 +27,8 @@ import org.lineageos.settings.utils.FileUtils;
 
 public final class ThermalUtils {
 
+    private static final String THERMAL_ENABLED = "thermal_master_enabled";
     private static final String THERMAL_CONTROL = "thermal_control";
-    private static final String THERMAL_SERVICE = "thermal_service";
 
     protected static final int STATE_DEFAULT = 0;
     protected static final int STATE_BENCHMARK = 1;
@@ -55,32 +55,41 @@ public final class ThermalUtils {
 
     private static final String THERMAL_SCONFIG = "/sys/class/thermal/thermal_message/sconfig";
 
+    private Context mContext;
     private SharedPreferences mSharedPrefs;
 
     protected ThermalUtils(Context context) {
+        mContext = context;
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     public static void initialize(Context context) {
-        if (isServiceEnabled(context))
+        if (isServiceEnabled(context)) {
             startService(context);
-        else
+        } else {
+            stopService(context);
             setDefaultThermalProfile();
+        }
     }
 
     protected static void startService(Context context) {
         context.startServiceAsUser(new Intent(context, ThermalService.class),
                 UserHandle.CURRENT);
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(THERMAL_SERVICE, "true").apply();
     }
 
     protected static void stopService(Context context) {
         context.stopService(new Intent(context, ThermalService.class));
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(THERMAL_SERVICE, "false").apply();
+    }
+
+    protected static void setServiceEnabled(Context context, Boolean enabled) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit().putBoolean(THERMAL_ENABLED, enabled).apply();
+        initialize(context);
     }
 
     protected static boolean isServiceEnabled(Context context) {
-        return true;
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(THERMAL_ENABLED, false);
     }
 
     private void writeValue(String profiles) {
@@ -157,6 +166,10 @@ public final class ThermalUtils {
     }
 
     protected void setThermalProfile(String packageName) {
+        if (!isServiceEnabled(mContext)) {
+            return;
+        }
+
         String value = getValue();
         String modes[];
         String state = THERMAL_STATE_DEFAULT;
