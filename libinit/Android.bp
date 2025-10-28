@@ -1,13 +1,12 @@
 //
-// Copyright (C) 2021 The LineageOS Project
+// Copyright (C) 2021-2025 The LineageOS Project
 //
 // SPDX-License-Identifier: Apache-2.0
 //
 
 cc_library_static {
-    name: "init_xiaomi_vayu",
-    srcs: ["init_xiaomi_vayu.cpp"],
-    whole_static_libs: ["//device/xiaomi/sm8150-common:libinit_xiaomi_msmnile"],
-    include_dirs: ["system/core/init"],
+    name: "libvariant_xiaomi_vayu",
+    srcs: ["libvariant_xiaomi_vayu.cpp"],
+    header_libs: ["//device/xiaomi/sm8150-common:libvariant_headers"],
     recovery_available: true,
 }
