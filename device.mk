@@ -5,6 +5,7 @@
 #
 
 TARGET_HAS_FM := true
+TARGET_HAS_IR := true
 
 # Inherit from sm8150-common
 $(call inherit-product, device/xiaomi/sm8150-common/msmnile.mk)
