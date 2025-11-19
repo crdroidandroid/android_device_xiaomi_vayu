@@ -1,3 +1,6 @@
+# Device name
+ro.product.marketname=Poco X3 Pro
+
 # Display
 debug.sf.frame_rate_multiple_threshold=120
 ro.surface_flinger.use_content_detection_for_refresh_rate=true
