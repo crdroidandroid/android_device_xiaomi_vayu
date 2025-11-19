@@ -7,4 +7,4 @@ ro.surface_flinger.set_touch_timer_ms=200
 
 # Fingerprint
 persist.vendor.fingerprint.type=side
-persist.vendor.fingerprint.sensor_location=1080|945|150|local:4630946480857061761,1080|945|150|local:4630946545580055169
+persist.vendor.fingerprint.sensor_location=1080|910|115|local:4630946480857061761,1080|910|115|local:4630946545580055169
