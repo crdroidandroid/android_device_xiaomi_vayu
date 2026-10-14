@@ -11,22 +11,16 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<androidx.core.widget.NestedScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:layout_height="match_parent">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <FrameLayout
+        android:id="@+id/prefs_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content" />
 
-        <FrameLayout
-            android:id="@+id/prefs_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <include layout="@layout/thermal_layout"/>
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+    <include layout="@layout/thermal_layout" />
+</LinearLayout>
