@@ -16,23 +16,35 @@
 
 package org.lineageos.settings.refreshrate;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.display.DisplayManager;
 import android.os.UserHandle;
+import android.provider.Settings;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Display;
 
-import android.provider.Settings;
 import androidx.preference.PreferenceManager;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public final class RefreshUtils {
+
+    private static final String TAG = "RefreshUtils";
 
     private static final String REFRESH_ENABLED = "refresh_master_enabled";
     private static final String REFRESH_CONTROL = "refresh_control";
 
-    private static final String KEY_PEAK_REFRESH_RATE = "peak_refresh_rate";
-    private static final String KEY_MIN_REFRESH_RATE = "min_refresh_rate";
-    private Context mContext;
+    private static final String KEY_OVERRIDE_ACTIVE = "refresh_override_active";
+    private static final String KEY_SAVED_PEAK = "refresh_saved_peak";
+    private static final String KEY_SAVED_MIN = "refresh_saved_min";
+
+    static final String KEY_PEAK_REFRESH_RATE = "peak_refresh_rate";
+    static final String KEY_MIN_REFRESH_RATE = "min_refresh_rate";
 
     protected static final int STATE_DEFAULT = 0;
     protected static final int STATE_LOW = 1;
@@ -41,38 +53,60 @@ public final class RefreshUtils {
     protected static final int STATE_HIGH = 4;
     protected static final int STATE_EXTREME = 5;
 
-    private static final float REFRESH_STATE_LOW = 30f;
-    private static final float REFRESH_STATE_MODERATE = 50f;
-    private static final float REFRESH_STATE_STANDARD = 60f;
-    private static final float REFRESH_STATE_HIGH = 90f;
-    private static final float REFRESH_STATE_EXTREME = 120f;
+    private static final String[] REFRESH_PREFIXES = {
+            null,
+            "refresh.low=",
+            "refresh.moderate=",
+            "refresh.standard=",
+            "refresh.high=",
+            "refresh.extreme=",
+    };
 
-    private static final String REFRESH_LOW = "refresh.low=";
-    private static final String REFRESH_MODERATE = "refresh.moderate=";
-    private static final String REFRESH_STANDARD = "refresh.standard=";
-    private static final String REFRESH_HIGH = "refresh.high=";
-    private static final String REFRESH_EXTREME = "refresh.extreme=";
+    private static final float[] REFRESH_RATES = {
+            0f,     // default: user's own setting
+            30f,
+            50f,
+            60f,
+            90f,
+            120f,
+    };
 
-    private static boolean isAppInList = false;
-    private static float defaultMaxRate;
-    private static float defaultMinRate;
+    private static volatile RefreshUtils sInstance;
 
-    private SharedPreferences mSharedPrefs;
+    private final Context mContext;
+    private final ContentResolver mResolver;
+    private final SharedPreferences mSharedPrefs;
 
-    protected RefreshUtils(Context context) {
-        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+    private final Map<String, Integer> mPackageStates = new HashMap<>();
+    private boolean mLoaded;
+
+    private final Object mSettingsLock = new Object();
+    private float mAppliedPeak = Float.NaN;
+    private float mAppliedMin = Float.NaN;
+
+    private RefreshUtils(Context context) {
         mContext = context;
+        mResolver = context.getContentResolver();
+        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+    }
+
+    public static RefreshUtils getInstance(Context context) {
+        if (sInstance == null) {
+            synchronized (RefreshUtils.class) {
+                if (sInstance == null) {
+                    sInstance = new RefreshUtils(context.getApplicationContext());
+                }
+            }
+        }
+        return sInstance;
     }
 
     public static void initialize(Context context) {
-        defaultMaxRate = Settings.System.getFloat(context.getContentResolver(), KEY_PEAK_REFRESH_RATE, REFRESH_STATE_EXTREME);
-        defaultMinRate = Settings.System.getFloat(context.getContentResolver(), KEY_MIN_REFRESH_RATE, REFRESH_STATE_STANDARD);
-
         if (isServiceEnabled(context)) {
             startService(context);
         } else {
             stopService(context);
-            setDefaultRefreshRate(context);
+            getInstance(context).restoreUserRefreshRate();
         }
     }
 
@@ -85,7 +119,7 @@ public final class RefreshUtils {
         context.stopService(new Intent(context, RefreshService.class));
     }
 
-    protected static void setServiceEnabled(Context context, Boolean enabled) {
+    protected static void setServiceEnabled(Context context, boolean enabled) {
         PreferenceManager.getDefaultSharedPreferences(context)
                 .edit().putBoolean(REFRESH_ENABLED, enabled).apply();
         initialize(context);
@@ -96,127 +130,210 @@ public final class RefreshUtils {
                 .getBoolean(REFRESH_ENABLED, false);
     }
 
-    private void writeValue(String profiles) {
-        mSharedPrefs.edit().putString(REFRESH_CONTROL, profiles).apply();
-    }
-
-    private String getValue() {
-        String value = mSharedPrefs.getString(REFRESH_CONTROL, null);
-
-        if (value == null || value.isEmpty()) {
-            value = REFRESH_LOW + ":" + REFRESH_MODERATE + ":" + REFRESH_STANDARD + ":" +
-                    REFRESH_HIGH + ":" + REFRESH_EXTREME;
-            writeValue(value);
-        }
-        return value;
-    }
-
-    protected void writePackage(String packageName, int mode) {
-        String value = getValue();
-        value = value.replace(packageName + ",", "");
-        String[] modes = value.split(":");
-        String finalString;
-
-        switch (mode) {
-            case STATE_LOW:
-                modes[0] = modes[0] + packageName + ",";
-                break;
-            case STATE_MODERATE:
-                modes[1] = modes[1] + packageName + ",";
-                break;
-            case STATE_STANDARD:
-                modes[2] = modes[2] + packageName + ",";
-                break;
-            case STATE_HIGH:
-                modes[3] = modes[3] + packageName + ",";
-                break;
-            case STATE_EXTREME:
-                modes[4] = modes[4] + packageName + ",";
-                break;
-        }
-
-        finalString = modes[0] + ":" + modes[1] + ":" + modes[2] + ":" + modes[3] + ":" +
-                modes[4];
-
-        writeValue(finalString);
-    }
-
-    protected int getStateForPackage(String packageName) {
-        String value = getValue();
-        String[] modes = value.split(":");
-        int state = STATE_DEFAULT;
-        if (modes[0].contains(packageName + ",")) {
-            state = STATE_LOW;
-        } else if (modes[1].contains(packageName + ",")) {
-            state = STATE_MODERATE;
-        } else if (modes[2].contains(packageName + ",")) {
-            state = STATE_STANDARD;
-        } else if (modes[3].contains(packageName + ",")) {
-            state = STATE_HIGH;
-        } else if (modes[4].contains(packageName + ",")) {
-            state = STATE_EXTREME;
-        }
-        return state;
-    }
-
     protected static void setDefaultRefreshRate(Context context) {
-        Settings.System.putFloat(context.getContentResolver(), KEY_PEAK_REFRESH_RATE, defaultMaxRate);
-        Settings.System.putFloat(context.getContentResolver(), KEY_MIN_REFRESH_RATE, defaultMinRate);
+        getInstance(context).restoreUserRefreshRate();
     }
 
-    protected void setRefreshRate(String packageName) {
-        if (!isServiceEnabled(mContext)) {
+
+    private void ensureLoadedLocked() {
+        if (mLoaded) {
+            return;
+        }
+        mPackageStates.clear();
+
+        final String value = mSharedPrefs.getString(REFRESH_CONTROL, null);
+        if (!TextUtils.isEmpty(value)) {
+            for (String segment : value.split(":")) {
+                for (int state = STATE_LOW; state < REFRESH_PREFIXES.length; state++) {
+                    final String prefix = REFRESH_PREFIXES[state];
+                    if (!segment.startsWith(prefix)) {
+                        continue;
+                    }
+                    for (String pkg : segment.substring(prefix.length()).split(",")) {
+                        pkg = pkg.trim();
+                        if (!pkg.isEmpty()) {
+                            // First match wins, same priority order as before.
+                            mPackageStates.putIfAbsent(pkg, state);
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        mLoaded = true;
+    }
+
+    private void persistLocked() {
+        final StringBuilder[] lists = new StringBuilder[REFRESH_PREFIXES.length];
+        for (int state = STATE_LOW; state < lists.length; state++) {
+            lists[state] = new StringBuilder(REFRESH_PREFIXES[state]);
+        }
+        for (Map.Entry<String, Integer> e : mPackageStates.entrySet()) {
+            lists[e.getValue()].append(e.getKey()).append(',');
+        }
+
+        final StringBuilder out = new StringBuilder();
+        for (int state = STATE_LOW; state < lists.length; state++) {
+            if (state > STATE_LOW) {
+                out.append(':');
+            }
+            out.append(lists[state]);
+        }
+        mSharedPrefs.edit().putString(REFRESH_CONTROL, out.toString()).apply();
+    }
+
+    protected synchronized void writePackage(String packageName, int mode) {
+        if (TextUtils.isEmpty(packageName) || mode < STATE_DEFAULT
+                || mode >= REFRESH_PREFIXES.length) {
+            return;
+        }
+        ensureLoadedLocked();
+
+        final Integer previous = mode == STATE_DEFAULT
+                ? mPackageStates.remove(packageName)
+                : mPackageStates.put(packageName, mode);
+
+        final int previousState = previous != null ? previous : STATE_DEFAULT;
+        if (previousState != mode) {
+            persistLocked();
+        }
+    }
+
+    protected synchronized int getStateForPackage(String packageName) {
+        if (TextUtils.isEmpty(packageName)) {
+            return STATE_DEFAULT;
+        }
+        ensureLoadedLocked();
+        final Integer state = mPackageStates.get(packageName);
+        return state != null ? state : STATE_DEFAULT;
+    }
+
+
+    protected void applyState(int state) {
+        if (state <= STATE_DEFAULT || state >= REFRESH_RATES.length) {
+            restoreUserRefreshRate();
             return;
         }
 
-        String value = getValue();
-        String modes[];
+        synchronized (mSettingsLock) {
+            if (!mSharedPrefs.getBoolean(KEY_OVERRIDE_ACTIVE, false)) {
+                mSharedPrefs.edit()
+                        .putString(KEY_SAVED_PEAK,
+                                Settings.System.getString(mResolver, KEY_PEAK_REFRESH_RATE))
+                        .putString(KEY_SAVED_MIN,
+                                Settings.System.getString(mResolver, KEY_MIN_REFRESH_RATE))
+                        .putBoolean(KEY_OVERRIDE_ACTIVE, true)
+                        .commit();
+            }
 
-        if (!isAppInList) {
-            defaultMaxRate = Settings.System.getFloat(mContext.getContentResolver(), KEY_PEAK_REFRESH_RATE, REFRESH_STATE_EXTREME);
-            defaultMinRate = Settings.System.getFloat(mContext.getContentResolver(), KEY_MIN_REFRESH_RATE, REFRESH_STATE_STANDARD);
+            final float peak = REFRESH_RATES[state];
+            final float userMin = parseRate(mSharedPrefs.getString(KEY_SAVED_MIN, null), 0f);
+            final float min = Math.min(userMin, peak);
+
+            if (Float.compare(peak, mAppliedPeak) == 0 && Float.compare(min, mAppliedMin) == 0) {
+                return; // Already applied, avoid a display mode re-evaluation.
+            }
+
+            mAppliedPeak = peak;
+            mAppliedMin = min;
+            Settings.System.putFloat(mResolver, KEY_PEAK_REFRESH_RATE, peak);
+            Settings.System.putFloat(mResolver, KEY_MIN_REFRESH_RATE, min);
+        }
+    }
+
+    protected void restoreUserRefreshRate() {
+        synchronized (mSettingsLock) {
+            mAppliedPeak = Float.NaN;
+            mAppliedMin = Float.NaN;
+            if (!mSharedPrefs.getBoolean(KEY_OVERRIDE_ACTIVE, false)) {
+                return;
+            }
+            restoreSettingLocked(KEY_PEAK_REFRESH_RATE,
+                    mSharedPrefs.getString(KEY_SAVED_PEAK, null));
+            restoreSettingLocked(KEY_MIN_REFRESH_RATE,
+                    mSharedPrefs.getString(KEY_SAVED_MIN, null));
+            clearSnapshotLocked();
+        }
+    }
+
+    protected boolean onSystemRefreshRateChanged() {
+        synchronized (mSettingsLock) {
+            if (!mSharedPrefs.getBoolean(KEY_OVERRIDE_ACTIVE, false)) {
+                return false;
+            }
+
+            final float peak = Settings.System.getFloat(mResolver, KEY_PEAK_REFRESH_RATE,
+                    Float.NaN);
+            final float min = Settings.System.getFloat(mResolver, KEY_MIN_REFRESH_RATE,
+                    Float.NaN);
+            final boolean peakIsOurs = Float.compare(peak, mAppliedPeak) == 0;
+            final boolean minIsOurs = Float.compare(min, mAppliedMin) == 0;
+            if (peakIsOurs && minIsOurs) {
+                return false;
+            }
+
+            if (peakIsOurs) {
+                restoreSettingLocked(KEY_PEAK_REFRESH_RATE,
+                        mSharedPrefs.getString(KEY_SAVED_PEAK, null));
+            }
+            if (minIsOurs) {
+                restoreSettingLocked(KEY_MIN_REFRESH_RATE,
+                        mSharedPrefs.getString(KEY_SAVED_MIN, null));
+            }
+            mAppliedPeak = Float.NaN;
+            mAppliedMin = Float.NaN;
+            clearSnapshotLocked();
+            return true;
+        }
+    }
+
+    private void restoreSettingLocked(String key, String savedValue) {
+        if (savedValue != null) {
+            Settings.System.putString(mResolver, key, savedValue);
+            return;
         }
 
-        float minrate = defaultMinRate;
-        float maxrate = defaultMaxRate;
+        int rows = 0;
+        try {
+            rows = mResolver.delete(Settings.System.CONTENT_URI,
+                    Settings.NameValueTable.NAME + "=?", new String[] { key });
+        } catch (RuntimeException e) {
+            Log.w(TAG, "Failed to delete " + key, e);
+        }
+        if (rows == 0 && Settings.System.getString(mResolver, key) != null) {
+            Settings.System.putFloat(mResolver, key,
+                    KEY_MIN_REFRESH_RATE.equals(key) ? 0f : getMaxSupportedRate());
+        }
+    }
 
-        if (value != null) {
-            modes = value.split(":");
-            if (modes[0].contains(packageName + ",")) {
-                maxrate = REFRESH_STATE_LOW;
-                if (minrate > maxrate) {
-                    minrate = maxrate;
-                }
-                isAppInList = true;
-            } else if (modes[1].contains(packageName + ",")) {
-                maxrate = REFRESH_STATE_MODERATE;
-                if (minrate > maxrate) {
-                    minrate = maxrate;
-                }
-                isAppInList = true;
-            } else if (modes[2].contains(packageName + ",")) {
-                maxrate = REFRESH_STATE_STANDARD;
-                if (minrate > maxrate) {
-                    minrate = maxrate;
-                }
-                isAppInList = true;
-            } else if (modes[3].contains(packageName + ",")) {
-                maxrate = REFRESH_STATE_HIGH;
-                if (minrate > maxrate) {
-                    minrate = maxrate;
-                }
-                isAppInList = true;
-            } else if (modes[4].contains(packageName + ",")) {
-                maxrate = REFRESH_STATE_EXTREME;
-                if (minrate > maxrate) {
-                    minrate = maxrate;
-                }
-                isAppInList = true;
-            } else {
-                isAppInList = false;
+    private void clearSnapshotLocked() {
+        mSharedPrefs.edit()
+                .remove(KEY_SAVED_PEAK)
+                .remove(KEY_SAVED_MIN)
+                .putBoolean(KEY_OVERRIDE_ACTIVE, false)
+                .commit();
+    }
+
+    private float getMaxSupportedRate() {
+        float max = REFRESH_RATES[STATE_STANDARD];
+        final DisplayManager dm = mContext.getSystemService(DisplayManager.class);
+        final Display display = dm != null ? dm.getDisplay(Display.DEFAULT_DISPLAY) : null;
+        if (display != null) {
+            for (Display.Mode mode : display.getSupportedModes()) {
+                max = Math.max(max, mode.getRefreshRate());
             }
         }
-        Settings.System.putFloat(mContext.getContentResolver(), KEY_PEAK_REFRESH_RATE, maxrate);
-        Settings.System.putFloat(mContext.getContentResolver(), KEY_MIN_REFRESH_RATE, minrate);
+        return max;
+    }
+
+    private static float parseRate(String value, float def) {
+        if (value == null) {
+            return def;
+        }
+        try {
+            return Float.parseFloat(value);
+        } catch (NumberFormatException e) {
+            return def;
+        }
     }
 }

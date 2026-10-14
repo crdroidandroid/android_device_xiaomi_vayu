@@ -16,80 +16,148 @@
 
 package org.lineageos.settings.refreshrate;
 
-import android.app.ActivityManager;
 import android.app.ActivityTaskManager;
 import android.app.ActivityTaskManager.RootTaskInfo;
 import android.app.IActivityTaskManager;
+import android.app.KeyguardManager;
 import android.app.Service;
 import android.app.TaskStackListener;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.ContentObserver;
+import android.net.Uri;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
-import android.util.Log;
+import android.os.PowerManager;
 import android.os.RemoteException;
+import android.provider.Settings;
+import android.util.Log;
 
 public class RefreshService extends Service {
 
     private static final String TAG = "RefreshService";
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
-    private String mPreviousApp;
+    private static final long UPDATE_DELAY_MS = 100;
+
+    private HandlerThread mHandlerThread;
+    private Handler mHandler;
     private RefreshUtils mRefreshUtils;
     private IActivityTaskManager mActivityTaskManager;
+    private KeyguardManager mKeyguardManager;
+    private ContentObserver mSettingsObserver;
+
+    private boolean mScreenOn = true;
+    private String mLastPackage;
+
+    private final Runnable mUpdateRunnable = this::updateForegroundProfile;
+
     private final TaskStackListener mTaskListener = new TaskStackListener() {
         @Override
         public void onTaskStackChanged() {
-            try {
-                final RootTaskInfo info = mActivityTaskManager.getFocusedRootTaskInfo();
-                if (info == null || info.topActivity == null) {
-                    return;
-                }
-                String foregroundApp = info.topActivity.getPackageName();
-                if (!foregroundApp.equals(mPreviousApp)) {
-                    mRefreshUtils.setRefreshRate(foregroundApp);
-                    mPreviousApp = foregroundApp;
-                }
-            } catch (Exception e) {}
-            }
-        };
+            scheduleUpdate(UPDATE_DELAY_MS);
+        }
+    };
 
-    private BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver mScreenReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            mPreviousApp = "";
-            mRefreshUtils.setDefaultRefreshRate(context);
+            final String action = intent.getAction();
+            if (Intent.ACTION_SCREEN_OFF.equals(action)) {
+                mScreenOn = false;
+                mHandler.removeCallbacks(mUpdateRunnable);
+                mLastPackage = null;
+                mRefreshUtils.restoreUserRefreshRate();
+            } else if (Intent.ACTION_SCREEN_ON.equals(action)) {
+                mScreenOn = true;
+                if (mKeyguardManager == null || !mKeyguardManager.isKeyguardLocked()) {
+                    scheduleUpdate(0);
+                }
+            } else if (Intent.ACTION_USER_PRESENT.equals(action)) {
+                mScreenOn = true;
+                scheduleUpdate(0);
+            }
         }
     };
 
     @Override
     public void onCreate() {
+        super.onCreate();
         if (DEBUG) Log.d(TAG, "Creating service");
-        mRefreshUtils = new RefreshUtils(this);
-        mRefreshUtils.setDefaultRefreshRate(this);
+
+        mHandlerThread = new HandlerThread(TAG);
+        mHandlerThread.start();
+        mHandler = new Handler(mHandlerThread.getLooper());
+
+        mRefreshUtils = RefreshUtils.getInstance(this);
+        mKeyguardManager = getSystemService(KeyguardManager.class);
+
+        final PowerManager pm = getSystemService(PowerManager.class);
+        mScreenOn = pm == null || pm.isInteractive();
+
+        mHandler.post(mRefreshUtils::restoreUserRefreshRate);
+
+        mSettingsObserver = new ContentObserver(mHandler) {
+            @Override
+            public void onChange(boolean selfChange, Uri uri) {
+                if (mRefreshUtils.onSystemRefreshRateChanged() && DEBUG) {
+                    Log.d(TAG, "User changed refresh rate, adopted as default");
+                }
+            }
+        };
+        getContentResolver().registerContentObserver(
+                Settings.System.getUriFor(RefreshUtils.KEY_PEAK_REFRESH_RATE),
+                false, mSettingsObserver);
+        getContentResolver().registerContentObserver(
+                Settings.System.getUriFor(RefreshUtils.KEY_MIN_REFRESH_RATE),
+                false, mSettingsObserver);
+
+        mActivityTaskManager = ActivityTaskManager.getService();
         try {
-            mActivityTaskManager = ActivityTaskManager.getService();
             mActivityTaskManager.registerTaskStackListener(mTaskListener);
         } catch (RemoteException e) {
-            // Do nothing
+            Log.e(TAG, "Failed to register task stack listener", e);
         }
-        registerReceiver();
-        super.onCreate();
+
+        final IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        filter.addAction(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_USER_PRESENT);
+        registerReceiver(mScreenReceiver, filter, null, mHandler,
+                Context.RECEIVER_NOT_EXPORTED);
+
+        scheduleUpdate(0);
     }
 
     @Override
     public void onDestroy() {
         if (DEBUG) Log.d(TAG, "Destroying service");
-        unregisterReceiver();
+
         try {
-            ActivityTaskManager.getService().unregisterTaskStackListener(mTaskListener);
-        } catch (RemoteException e) {
-            // Do nothing
+            unregisterReceiver(mScreenReceiver);
+        } catch (IllegalArgumentException e) {
+            // Not registered
         }
-        mRefreshUtils.setDefaultRefreshRate(this);
+
+        if (mSettingsObserver != null) {
+            getContentResolver().unregisterContentObserver(mSettingsObserver);
+        }
+
+        if (mActivityTaskManager != null) {
+            try {
+                mActivityTaskManager.unregisterTaskStackListener(mTaskListener);
+            } catch (RemoteException e) {
+                Log.e(TAG, "Failed to unregister task stack listener", e);
+            }
+        }
+
+        mHandler.removeCallbacksAndMessages(null);
+        mHandler.post(mRefreshUtils::restoreUserRefreshRate);
+        mHandlerThread.quitSafely();
+
         super.onDestroy();
     }
 
@@ -104,14 +172,39 @@ public class RefreshService extends Service {
         return null;
     }
 
-    private void registerReceiver() {
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_SCREEN_OFF);
-        filter.addAction(Intent.ACTION_SCREEN_ON);        
-        this.registerReceiver(mIntentReceiver, filter);
+    private void scheduleUpdate(long delayMs) {
+        final Handler handler = mHandler;
+        if (handler == null) {
+            return;
+        }
+        handler.removeCallbacks(mUpdateRunnable);
+        handler.postDelayed(mUpdateRunnable, delayMs);
     }
 
-    private void unregisterReceiver() {
-        this.unregisterReceiver(mIntentReceiver);
+    private void updateForegroundProfile() {
+        if (!mScreenOn || mActivityTaskManager == null) {
+            return;
+        }
+
+        final RootTaskInfo info;
+        try {
+            info = mActivityTaskManager.getFocusedRootTaskInfo();
+        } catch (RemoteException e) {
+            Log.w(TAG, "Failed to get focused task", e);
+            return;
+        }
+        if (info == null || info.topActivity == null) {
+            return;
+        }
+
+        final String foregroundApp = info.topActivity.getPackageName();
+        if (foregroundApp.equals(mLastPackage)) {
+            return;
+        }
+        mLastPackage = foregroundApp;
+
+        final int state = mRefreshUtils.getStateForPackage(foregroundApp);
+        if (DEBUG) Log.d(TAG, foregroundApp + " -> state " + state);
+        mRefreshUtils.applyState(state);
     }
 }

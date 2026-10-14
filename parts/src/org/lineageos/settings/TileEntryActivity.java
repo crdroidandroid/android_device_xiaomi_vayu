@@ -28,31 +28,36 @@ import androidx.annotation.Nullable;
 import org.lineageos.settings.refreshrate.RefreshActivity;
 
 public class TileEntryActivity extends Activity {
+
     private static final String TAG = "TileEntryActivity";
+
     private static final String REFRESH_TILE = "org.lineageos.settings.refreshrate.RefreshTileService";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ComponentName sourceClass = getIntent().getParcelableExtra(Intent.EXTRA_COMPONENT_NAME);
-        switch (sourceClass.getClassName()) {
-            case REFRESH_TILE:
-                openActivitySafely(new Intent(this, RefreshActivity.class));
-                break;    
-            default:
-                finish();
-                break;
+
+        final ComponentName source = getIntent().getParcelableExtra(
+                Intent.EXTRA_COMPONENT_NAME, ComponentName.class);
+        if (source == null) {
+            finish();
+            return;
+        }
+
+        if (REFRESH_TILE.equals(source.getClassName())) {
+            openActivitySafely(new Intent(this, RefreshActivity.class));
+        } else {
+            finish();
         }
     }
 
     private void openActivitySafely(Intent dest) {
+        dest.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
         try {
-            dest.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
-            finish();
             startActivity(dest);
         } catch (ActivityNotFoundException e) {
-            Log.e(TAG, "No activity found for " + dest);
-            finish();
+            Log.e(TAG, "No activity found for " + dest, e);
         }
+        finish();
     }
 }
