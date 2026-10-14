@@ -41,6 +41,7 @@ import com.android.settingslib.widget.SettingsBasePreferenceFragment;
 import org.lineageos.settings.R;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -57,6 +58,9 @@ public class RefreshSettingsFragment extends SettingsBasePreferenceFragment
     private AllPackagesAdapter mAllPackagesAdapter;
     private RefreshUtils mRefreshUtils;
     private RecyclerView mAppsRecyclerView;
+
+    private float[] mSupportedRates = new float[0];
+    private int[] mSupportedStates = { RefreshUtils.STATE_DEFAULT };
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -83,6 +87,9 @@ public class RefreshSettingsFragment extends SettingsBasePreferenceFragment
         final Context context = requireContext();
         mAppContext = context.getApplicationContext();
         mRefreshUtils = RefreshUtils.getInstance(mAppContext);
+
+        mSupportedRates = mRefreshUtils.getSupportedRates();
+        mSupportedStates = RefreshUtils.getSupportedStates(mSupportedRates);
 
         mApplicationsState = ApplicationsState.getInstance(requireActivity().getApplication());
         mSession = mApplicationsState.newSession(this);
@@ -115,6 +122,7 @@ public class RefreshSettingsFragment extends SettingsBasePreferenceFragment
     @Override
     public void onResume() {
         super.onResume();
+        refreshSupportedRates();
         mSession.onResume();
         rebuild();
     }
@@ -179,6 +187,16 @@ public class RefreshSettingsFragment extends SettingsBasePreferenceFragment
     public void onRunningStateChanged(boolean running) {
     }
 
+    private void refreshSupportedRates() {
+        final float[] rates = mRefreshUtils.getSupportedRates();
+        final int[] states = RefreshUtils.getSupportedStates(rates);
+        mSupportedRates = rates;
+        if (!Arrays.equals(states, mSupportedStates)) {
+            mSupportedStates = states;
+            mAllPackagesAdapter.onSupportedStatesChanged();
+        }
+    }
+
     private void rebuild() {
         if (mSession == null || !RefreshUtils.isServiceEnabled(mAppContext)) {
             return;
@@ -191,6 +209,20 @@ public class RefreshSettingsFragment extends SettingsBasePreferenceFragment
             mAppsRecyclerView.setEnabled(enabled);
             mAppsRecyclerView.setVisibility(enabled ? View.VISIBLE : View.GONE);
         }
+    }
+
+    private int getEffectiveStateForPackage(String packageName) {
+        return RefreshUtils.getEffectiveState(
+                mRefreshUtils.getStateForPackage(packageName), mSupportedRates);
+    }
+
+    private int positionForState(int state) {
+        for (int i = 0; i < mSupportedStates.length; i++) {
+            if (mSupportedStates[i] == state) {
+                return i;
+            }
+        }
+        return 0; // Default
     }
 
     private static int getStateDrawable(int state) {
@@ -211,6 +243,24 @@ public class RefreshSettingsFragment extends SettingsBasePreferenceFragment
         }
     }
 
+    private static int getStateLabel(int state) {
+        switch (state) {
+            case RefreshUtils.STATE_LOW:
+                return R.string.refresh_low;
+            case RefreshUtils.STATE_MODERATE:
+                return R.string.refresh_moderate;
+            case RefreshUtils.STATE_STANDARD:
+                return R.string.refresh_standard;
+            case RefreshUtils.STATE_HIGH:
+                return R.string.refresh_high;
+            case RefreshUtils.STATE_EXTREME:
+                return R.string.refresh_extreme;
+            case RefreshUtils.STATE_DEFAULT:
+            default:
+                return R.string.refresh_default;
+        }
+    }
+
     private static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView title;
         private final Spinner mode;
@@ -226,17 +276,7 @@ public class RefreshSettingsFragment extends SettingsBasePreferenceFragment
         }
     }
 
-    private static class ModeAdapter extends BaseAdapter {
-
-        // Order must match RefreshUtils.STATE_*.
-        private static final int[] ITEMS = {
-                R.string.refresh_default,
-                R.string.refresh_low,
-                R.string.refresh_moderate,
-                R.string.refresh_standard,
-                R.string.refresh_high,
-                R.string.refresh_extreme
-        };
+    private class ModeAdapter extends BaseAdapter {
 
         private final LayoutInflater mInflater;
 
@@ -246,17 +286,17 @@ public class RefreshSettingsFragment extends SettingsBasePreferenceFragment
 
         @Override
         public int getCount() {
-            return ITEMS.length;
+            return mSupportedStates.length;
         }
 
         @Override
         public Object getItem(int position) {
-            return ITEMS[position];
+            return mSupportedStates[position];
         }
 
         @Override
         public long getItemId(int position) {
-            return position;
+            return mSupportedStates[position];
         }
 
         @Override
@@ -268,7 +308,7 @@ public class RefreshSettingsFragment extends SettingsBasePreferenceFragment
                 view = (TextView) mInflater.inflate(
                         android.R.layout.simple_spinner_dropdown_item, parent, false);
             }
-            view.setText(ITEMS[position]);
+            view.setText(getStateLabel(mSupportedStates[position]));
             view.setTextSize(14f);
             return view;
         }
@@ -282,6 +322,11 @@ public class RefreshSettingsFragment extends SettingsBasePreferenceFragment
         private AllPackagesAdapter(Context context) {
             mModeAdapter = new ModeAdapter(context);
             setHasStableIds(true);
+        }
+
+        private void onSupportedStatesChanged() {
+            mModeAdapter.notifyDataSetChanged();
+            notifyDataSetChanged();
         }
 
         @Override
@@ -311,14 +356,16 @@ public class RefreshSettingsFragment extends SettingsBasePreferenceFragment
                 public void onItemSelected(AdapterView<?> parent, View view, int position,
                         long id) {
                     final Object tag = parent.getTag();
-                    if (!(tag instanceof ApplicationsState.AppEntry)) {
+                    if (!(tag instanceof ApplicationsState.AppEntry)
+                            || position < 0 || position >= mSupportedStates.length) {
                         return;
                     }
                     final String pkg = ((ApplicationsState.AppEntry) tag).info.packageName;
-                    if (mRefreshUtils.getStateForPackage(pkg) != position) {
-                        mRefreshUtils.writePackage(pkg, position);
+                    final int selected = mSupportedStates[position];
+                    if (getEffectiveStateForPackage(pkg) != selected) {
+                        mRefreshUtils.writePackage(pkg, selected);
                     }
-                    holder.stateIcon.setImageResource(getStateDrawable(position));
+                    holder.stateIcon.setImageResource(getStateDrawable(selected));
                 }
 
                 @Override
@@ -340,11 +387,11 @@ public class RefreshSettingsFragment extends SettingsBasePreferenceFragment
             mApplicationsState.ensureIcon(entry);
             holder.icon.setImageDrawable(entry.icon);
 
-            final int state = mRefreshUtils.getStateForPackage(entry.info.packageName);
+            final int state = getEffectiveStateForPackage(entry.info.packageName);
             // Tag before selection so any deferred onItemSelected() from the
             // Spinner sees the entry this row is now bound to.
             holder.mode.setTag(entry);
-            holder.mode.setSelection(state, false);
+            holder.mode.setSelection(positionForState(state), false);
             holder.stateIcon.setImageResource(getStateDrawable(state));
         }
 

@@ -29,7 +29,10 @@ import android.view.Display;
 
 import androidx.preference.PreferenceManager;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class RefreshUtils {
@@ -70,6 +73,9 @@ public final class RefreshUtils {
             90f,
             120f,
     };
+
+    // Panels report values like 59.94 or 120.0001; treat anything this close as a match.
+    private static final float RATE_TOLERANCE = 1f;
 
     private static volatile RefreshUtils sInstance;
 
@@ -134,6 +140,98 @@ public final class RefreshUtils {
         getInstance(context).restoreUserRefreshRate();
     }
 
+    protected float[] getSupportedRates() {
+        final DisplayManager dm = mContext.getSystemService(DisplayManager.class);
+        final Display display = dm != null ? dm.getDisplay(Display.DEFAULT_DISPLAY) : null;
+        if (display == null) {
+            return new float[0];
+        }
+
+        final Display.Mode active = display.getMode();
+        final Display.Mode[] modes = display.getSupportedModes();
+
+        List<Float> rates = collectRates(modes, active, true);
+        if (rates.isEmpty()) {
+            rates = collectRates(modes, active, false);
+        }
+
+        final float[] sorted = new float[rates.size()];
+        for (int i = 0; i < sorted.length; i++) {
+            sorted[i] = rates.get(i);
+        }
+        Arrays.sort(sorted);
+
+        int count = 0;
+        for (float rate : sorted) {
+            if (count == 0 || rate - sorted[count - 1] > RATE_TOLERANCE) {
+                sorted[count++] = rate;
+            }
+        }
+        return Arrays.copyOf(sorted, count);
+    }
+
+    private static List<Float> collectRates(Display.Mode[] modes, Display.Mode active,
+            boolean sameResolutionOnly) {
+        final List<Float> rates = new ArrayList<>();
+        for (Display.Mode mode : modes) {
+            if (sameResolutionOnly && active != null
+                    && (mode.getPhysicalWidth() != active.getPhysicalWidth()
+                    || mode.getPhysicalHeight() != active.getPhysicalHeight())) {
+                continue;
+            }
+            rates.add(mode.getRefreshRate());
+        }
+        return rates;
+    }
+
+    private static float findSupportedRate(float target, float[] rates) {
+        for (float rate : rates) {
+            if (Math.abs(rate - target) <= RATE_TOLERANCE) {
+                return rate;
+            }
+        }
+        return Float.NaN;
+    }
+
+    private static boolean isStateSupported(int state, float[] rates) {
+        return rates.length == 0 || !Float.isNaN(findSupportedRate(REFRESH_RATES[state], rates));
+    }
+
+    protected static int[] getSupportedStates(float[] rates) {
+        final int[] states = new int[REFRESH_RATES.length];
+        int count = 0;
+        states[count++] = STATE_DEFAULT;
+        for (int state = STATE_LOW; state < REFRESH_RATES.length; state++) {
+            if (isStateSupported(state, rates)) {
+                states[count++] = state;
+            }
+        }
+        return Arrays.copyOf(states, count);
+    }
+
+    protected static int getEffectiveState(int state, float[] rates) {
+        if (state <= STATE_DEFAULT || state >= REFRESH_RATES.length) {
+            return STATE_DEFAULT;
+        }
+        if (isStateSupported(state, rates)) {
+            return state;
+        }
+
+        int below = STATE_DEFAULT;
+        int lowest = STATE_DEFAULT;
+        for (int s = STATE_LOW; s < REFRESH_RATES.length; s++) {
+            if (!isStateSupported(s, rates)) {
+                continue;
+            }
+            if (lowest == STATE_DEFAULT) {
+                lowest = s;
+            }
+            if (REFRESH_RATES[s] <= REFRESH_RATES[state]) {
+                below = s;
+            }
+        }
+        return below != STATE_DEFAULT ? below : lowest;
+    }
 
     private void ensureLoadedLocked() {
         if (mLoaded) {
@@ -208,9 +306,11 @@ public final class RefreshUtils {
         return state != null ? state : STATE_DEFAULT;
     }
 
-
+    /** Applies the given STATE_*; STATE_DEFAULT restores the user's own values. */
     protected void applyState(int state) {
-        if (state <= STATE_DEFAULT || state >= REFRESH_RATES.length) {
+        final float[] rates = getSupportedRates();
+        state = getEffectiveState(state, rates);
+        if (state == STATE_DEFAULT) {
             restoreUserRefreshRate();
             return;
         }
@@ -226,7 +326,10 @@ public final class RefreshUtils {
                         .commit();
             }
 
-            final float peak = REFRESH_RATES[state];
+            final float nominal = REFRESH_RATES[state];
+            final float panelRate = findSupportedRate(nominal, rates);
+            final float peak = Float.isNaN(panelRate) ? nominal : Math.max(nominal, panelRate);
+
             final float userMin = parseRate(mSharedPrefs.getString(KEY_SAVED_MIN, null), 0f);
             final float min = Math.min(userMin, peak);
 
@@ -315,15 +418,8 @@ public final class RefreshUtils {
     }
 
     private float getMaxSupportedRate() {
-        float max = REFRESH_RATES[STATE_STANDARD];
-        final DisplayManager dm = mContext.getSystemService(DisplayManager.class);
-        final Display display = dm != null ? dm.getDisplay(Display.DEFAULT_DISPLAY) : null;
-        if (display != null) {
-            for (Display.Mode mode : display.getSupportedModes()) {
-                max = Math.max(max, mode.getRefreshRate());
-            }
-        }
-        return max;
+        final float[] rates = getSupportedRates();
+        return rates.length > 0 ? rates[rates.length - 1] : REFRESH_RATES[STATE_STANDARD];
     }
 
     private static float parseRate(String value, float def) {
