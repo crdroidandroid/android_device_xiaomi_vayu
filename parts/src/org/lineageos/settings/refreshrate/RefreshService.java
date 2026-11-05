@@ -43,11 +43,14 @@ public class RefreshService extends Service {
 
     private static final long UPDATE_DELAY_MS = 100;
 
+    private static final long SCREEN_ON_DELAY_MS = 500;
+
     private HandlerThread mHandlerThread;
     private Handler mHandler;
     private RefreshUtils mRefreshUtils;
     private IActivityTaskManager mActivityTaskManager;
     private KeyguardManager mKeyguardManager;
+    private PowerManager mPowerManager;
     private ContentObserver mSettingsObserver;
 
     private boolean mScreenOn = true;
@@ -70,15 +73,14 @@ public class RefreshService extends Service {
                 mScreenOn = false;
                 mHandler.removeCallbacks(mUpdateRunnable);
                 mLastPackage = null;
-                mRefreshUtils.restoreUserRefreshRate();
             } else if (Intent.ACTION_SCREEN_ON.equals(action)) {
                 mScreenOn = true;
                 if (mKeyguardManager == null || !mKeyguardManager.isKeyguardLocked()) {
-                    scheduleUpdate(0);
+                    scheduleUpdate(SCREEN_ON_DELAY_MS);
                 }
             } else if (Intent.ACTION_USER_PRESENT.equals(action)) {
                 mScreenOn = true;
-                scheduleUpdate(0);
+                scheduleUpdate(SCREEN_ON_DELAY_MS);
             }
         }
     };
@@ -95,8 +97,8 @@ public class RefreshService extends Service {
         mRefreshUtils = RefreshUtils.getInstance(this);
         mKeyguardManager = getSystemService(KeyguardManager.class);
 
-        final PowerManager pm = getSystemService(PowerManager.class);
-        mScreenOn = pm == null || pm.isInteractive();
+        mPowerManager = getSystemService(PowerManager.class);
+        mScreenOn = mPowerManager == null || mPowerManager.isInteractive();
 
         mHandler.post(mRefreshUtils::restoreUserRefreshRate);
 
@@ -172,6 +174,11 @@ public class RefreshService extends Service {
         return null;
     }
 
+    private boolean isInteractive() {
+        final PowerManager pm = mPowerManager;
+        return pm == null || pm.isInteractive();
+    }
+
     private void scheduleUpdate(long delayMs) {
         final Handler handler = mHandler;
         if (handler == null) {
@@ -182,7 +189,7 @@ public class RefreshService extends Service {
     }
 
     private void updateForegroundProfile() {
-        if (!mScreenOn || mActivityTaskManager == null) {
+        if (!mScreenOn || mActivityTaskManager == null || !isInteractive()) {
             return;
         }
 
